@@ -24,7 +24,8 @@ LearningSystemML/
 │   │   ├── graph_builder.py    # Build bipartite and directed graphs
 │   │   └── centrality_analysis.py # Centrality measures and analysis
 │   ├── models/                 # GNN model implementations
-│   │   └── gnn_model.py        # PyTorch Geometric GNN models
+│   │   ├── gnn_model.py        # PyTorch Geometric GNN models
+│   │   └── trainer.py          # Model training and evaluation pipeline
 │   └── evaluation/             # Model evaluation and metrics
 │       └── metrics.py          # Evaluation metrics and visualization
 ├── notebooks/                  # Jupyter notebooks for exploration
@@ -92,12 +93,12 @@ python main.py --phase data
 python main.py --phase graph
 ```
 
-3. **Model Phase**: Train GNN models (TODO)
+3. **Model Phase**: Train GNN models for dropout prediction
 ```bash
 python main.py --phase model
 ```
 
-4. **Evaluation Phase**: Evaluate model performance (TODO)
+4. **Evaluation Phase**: Evaluate trained model performance
 ```bash
 python main.py --phase evaluation
 ```
@@ -126,10 +127,11 @@ The project uses the Stanford SNAP MOOC User Action Dataset:
 - **Visualization**: Generate graph visualizations for understanding user-activity relationships
 
 ### Phase 2: GNN-Based Prediction (PyTorch Geometric)
-- **Problem Formulation**: Link prediction to estimate dropout likelihood
-- **Model Architecture**: Graph Convolutional Networks (GCN) and GraphSAGE
-- **Features**: Node embeddings capturing both content and network position
-- **Training**: Supervised learning using dropout labels
+- **Problem Formulation**: Edge-level binary classification to predict dropout likelihood
+- **Model Architecture**: Graph Convolutional Networks (GCN) with edge predictor
+- **Features**: Node embeddings from GNN layers, concatenated for edge prediction
+- **Training**: Supervised learning using binary dropout labels with BCE loss
+- **Evaluation**: Comprehensive metrics including accuracy, precision, recall, F1, and ROC-AUC
 
 ## Key Features
 
@@ -150,11 +152,23 @@ Modify `config/config.py` to customize:
 
 ## Results
 
-The analysis generates several outputs:
+The analysis generates comprehensive outputs:
+
+### Dataset Statistics
+- **411,749 actions** from **7,047 users** across **97 activities**
+- **~1% dropout rate** (4,066 dropout actions)
+- **Bipartite graph** with 14,288 nodes and 174,870 edges
+
+### Graph Analysis Outputs
 - **Graph Statistics**: Node/edge counts, connectivity metrics
-- **Centrality Reports**: Most influential activities and users
-- **Visualizations**: Graph plots and centrality distributions
-- **Model Metrics**: Classification performance (accuracy, precision, recall, F1, AUC)
+- **Centrality Reports**: Most influential activities and users (saved as CSV)
+- **Visualizations**: Graph plots and centrality distributions (PNG files)
+
+### Model Performance
+- **Training**: GNN model with edge predictor for binary classification
+- **Evaluation Metrics**: Accuracy, precision, recall, F1-score, ROC-AUC
+- **Model Artifacts**: Trained models saved as `.pth` files
+- **Training History**: Loss and accuracy curves saved as CSV
 
 ## Dependencies
 
@@ -175,20 +189,23 @@ See `requirements.txt` for complete dependency list.
 - ✅ Graph construction (bipartite and directed graphs)
 - ✅ Centrality analysis (degree and betweenness centrality)
 - ✅ Graph visualization and reporting
-- ✅ End-to-end data pipeline working
-- ✅ GNN model architecture (PyTorch Geometric ready)
-- ✅ Evaluation metrics framework
-- ⏳ Model training pipeline (TODO - framework ready)
-- ⏳ End-to-end GNN evaluation (TODO - framework ready)
+- ✅ GNN model architecture with edge-level prediction
+- ✅ Complete model training pipeline with MOOCGNNTrainer
+- ✅ Comprehensive evaluation metrics and reporting
+- ✅ **End-to-end pipeline fully operational**
+- ✅ Model save/load functionality with proper serialization
+- ✅ Training history and metrics export
 
 ## Future Enhancements
 
+- [ ] Address class imbalance in dropout prediction (currently ~1% positive class)
 - [ ] Implement temporal graph analysis for sequential learning patterns
-- [ ] Add more sophisticated node feature engineering
+- [ ] Add more sophisticated node feature engineering (user demographics, activity content)
 - [ ] Experiment with different GNN architectures (GAT, GraphSAINT)
-- [ ] Implement hyperparameter optimization
-- [ ] Add model interpretability features
-- [ ] Create web interface for predictions
+- [ ] Implement hyperparameter optimization and cross-validation
+- [ ] Add model interpretability features (attention visualization, important edges)
+- [ ] Create web interface for real-time dropout risk predictions
+- [ ] Implement ensemble methods combining multiple GNN architectures
 
 ## Contributing
 
