@@ -1,0 +1,27 @@
+# Core dependencies
+numpy==2.3.2
+pandas==2.3.2
+scikit-learn==1.7.1
+
+# Graph processing
+networkx==3.5
+matplotlib==3.10.6
+seaborn==0.13.2
+
+# Deep learning and GNN
+torch==2.8.0
+torch-geometric==2.6.1
+# dgl>=0.9.0  # Commented out due to compatibility issues
+
+# Data processing
+scipy==1.16.1
+tqdm==4.67.1
+
+# Jupyter and visualization
+jupyter==1.1.1
+plotly==6.3.0
+ipywidgets==8.1.7
+
+# Utilities
+requests==2.32.5
+python-dotenv==1.1.1

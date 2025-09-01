@@ -1,0 +1,27 @@
+2025-09-01 17:17:06,259 - __main__ - INFO - Starting MOOC Dropout Prediction Pipeline
+2025-09-01 17:17:06,260 - __main__ - INFO - Project: MOOC Dropout Prediction v1.0.0
+2025-09-01 17:17:06,260 - __main__ - INFO - Running phase: all
+2025-09-01 17:17:06,260 - __main__ - INFO - Starting data phase...
+2025-09-01 17:17:15,178 - __main__ - INFO - Data summary: {'error': 'File data\\raw\\mooc_actions.tsv not found. Please download the dataset first.'}
+2025-09-01 17:17:15,178 - __main__ - INFO - Starting graph analysis phase...
+2025-09-01 17:17:15,178 - __main__ - ERROR - Data files not found. Please run data phase first.
+2025-09-01 17:17:15,180 - __main__ - ERROR - Graph phase failed
+2025-09-01 17:18:04,193 - __main__ - INFO - Starting MOOC Dropout Prediction Pipeline
+2025-09-01 17:18:04,193 - __main__ - INFO - Project: MOOC Dropout Prediction v1.0.0
+2025-09-01 17:18:04,193 - __main__ - INFO - Running phase: all
+2025-09-01 17:18:04,193 - __main__ - INFO - Starting data phase...
+2025-09-01 17:18:04,404 - __main__ - INFO - Data summary: {'total_actions': 411749, 'total_labeled_actions': 411749, 'unique_users': 7047, 'unique_targets': 97, 'label_distribution': {0: 407683, 1: 4066}}
+2025-09-01 17:18:04,404 - __main__ - INFO - Starting graph analysis phase...
+2025-09-01 17:19:04,778 - __main__ - INFO - Starting MOOC Dropout Prediction Pipeline
+2025-09-01 17:19:04,778 - __main__ - INFO - Project: MOOC Dropout Prediction v1.0.0
+2025-09-01 17:19:04,778 - __main__ - INFO - Running phase: all
+2025-09-01 17:19:04,778 - __main__ - INFO - Starting data phase...
+2025-09-01 17:19:04,951 - __main__ - INFO - Data summary: {'total_actions': 411749, 'total_labeled_actions': 411749, 'unique_users': 7047, 'unique_targets': 97, 'label_distribution': {0: 407683, 1: 4066}}
+2025-09-01 17:19:04,951 - __main__ - INFO - Starting graph analysis phase...
+2025-09-01 17:19:17,414 - __main__ - INFO - Graph statistics: {'num_nodes': 14288, 'num_edges': 174870, 'is_directed': False, 'is_connected': False, 'num_users': 7047, 'num_targets': 97}
+2025-09-01 17:20:58,537 - __main__ - INFO - Centrality report saved to logs\results\centrality_report.csv
+2025-09-01 17:20:59,096 - __main__ - INFO - Starting model training phase...
+2025-09-01 17:20:59,096 - __main__ - WARNING - Model training phase not yet implemented
+2025-09-01 17:20:59,096 - __main__ - INFO - Starting evaluation phase...
+2025-09-01 17:20:59,096 - __main__ - WARNING - Evaluation phase not yet implemented
+2025-09-01 17:20:59,096 - __main__ - INFO - Pipeline completed successfully!
