@@ -115,29 +115,134 @@ def run_model_phase(config, logger):
     """Run GNN model training phase"""
     logger.info("Starting model training phase...")
     
-    # TODO: Implement model training pipeline
-    # This would include:
-    # 1. Data preparation for PyTorch Geometric
-    # 2. Model initialization
-    # 3. Training loop
-    # 4. Model saving
-    
-    logger.warning("Model training phase not yet implemented")
-    return True
+    try:
+        from src.models.trainer import MOOCGNNTrainer
+        
+        # Load data and graph
+        loader = MOOCDataLoader(config.data.raw_data_dir)
+        df = loader.load_combined_data()
+        
+        # Build graph
+        builder = MOOCGraphBuilder()
+        if config.graph.graph_type == "bipartite":
+            graph = builder.build_bipartite_graph(df)
+        elif config.graph.graph_type == "directed":
+            graph = builder.build_directed_graph(df)
+        else:
+            logger.error(f"Unsupported graph type: {config.graph.graph_type}")
+            return False
+        
+        # Initialize trainer
+        trainer = MOOCGNNTrainer(config)
+        
+        # Prepare graph data for PyTorch Geometric
+        pyg_data, labels = trainer.prepare_graph_data(graph, df)
+        
+        # Create train/test split
+        train_data, test_data, train_labels, test_labels = trainer.create_train_test_split(
+            pyg_data, labels
+        )
+        
+        # Further split training data for validation
+        train_data_final, val_data, train_labels_final, val_labels = trainer.create_train_test_split(
+            train_data, train_labels
+        )
+        
+        # Initialize model
+        input_dim = pyg_data.x.shape[1]
+        model = trainer.initialize_model(input_dim)
+        
+        # Train model
+        history = trainer.train_model(
+            train_data_final, train_labels_final,
+            val_data, val_labels
+        )
+        
+        # Save final model
+        trainer.save_model('final_model.pth')
+        
+        # Quick evaluation on test set
+        test_metrics = trainer.evaluate_model(test_data, test_labels)
+        
+        # Save training history and metrics
+        import pandas as pd
+        from pathlib import Path
+        
+        history_df = pd.DataFrame(history)
+        history_path = Path(config.evaluation.results_dir) / "training_history.csv"
+        history_df.to_csv(history_path, index=False)
+        
+        metrics_df = pd.DataFrame([test_metrics])
+        metrics_path = Path(config.evaluation.results_dir) / "model_metrics.csv"
+        metrics_df.to_csv(metrics_path, index=False)
+        
+        logger.info(f"Model training completed successfully!")
+        logger.info(f"Final test accuracy: {test_metrics['accuracy']:.4f}")
+        logger.info(f"Final test F1-score: {test_metrics['f1_score']:.4f}")
+        logger.info(f"Training history saved to: {history_path}")
+        logger.info(f"Model metrics saved to: {metrics_path}")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Model training failed: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
 
 def run_evaluation_phase(config, logger):
     """Run model evaluation phase"""
     logger.info("Starting evaluation phase...")
     
-    # TODO: Implement model evaluation
-    # This would include:
-    # 1. Loading trained model
-    # 2. Generating predictions
-    # 3. Computing metrics
-    # 4. Creating visualizations
-    
-    logger.warning("Evaluation phase not yet implemented")
-    return True
+    try:
+        from src.models.trainer import MOOCGNNTrainer
+        from src.evaluation.metrics import ModelEvaluator
+        from pathlib import Path
+        
+        # Check if model exists
+        model_path = Path(config.model.model_save_dir) / 'best_model.pth'
+        if not model_path.exists():
+            model_path = Path(config.model.model_save_dir) / 'final_model.pth'
+            if not model_path.exists():
+                logger.warning("No trained model found. Please run model training first.")
+                return True
+        
+        # Load data and graph (same as training)
+        loader = MOOCDataLoader(config.data.raw_data_dir)
+        df = loader.load_combined_data()
+        
+        builder = MOOCGraphBuilder()
+        if config.graph.graph_type == "bipartite":
+            graph = builder.build_bipartite_graph(df)
+        elif config.graph.graph_type == "directed":
+            graph = builder.build_directed_graph(df)
+        else:
+            logger.error(f"Unsupported graph type: {config.graph.graph_type}")
+            return False
+        
+        # Initialize trainer and load model
+        trainer = MOOCGNNTrainer(config)
+        trainer.load_model(model_path.name)
+        
+        # Prepare data
+        pyg_data, labels = trainer.prepare_graph_data(graph, df)
+        _, test_data, _, test_labels = trainer.create_train_test_split(pyg_data, labels)
+        
+        # Evaluate model
+        metrics = trainer.evaluate_model(test_data, test_labels)
+        
+        # Create detailed evaluation report
+        evaluator = ModelEvaluator(config)
+        evaluator.create_evaluation_report(metrics, test_labels, model_path.name)
+        
+        logger.info("Model evaluation completed successfully!")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Model evaluation failed: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return True  # Don't fail the pipeline for evaluation issues
 
 def main():
     """Main execution function"""

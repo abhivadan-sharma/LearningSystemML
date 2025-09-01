@@ -43,14 +43,20 @@ class DropoutPredictionGNN(nn.Module):
         
         self.dropout = nn.Dropout(dropout_rate)
     
-    def forward(self, x, edge_index, batch=None):
-        """Forward pass through the GNN"""
+    def get_embeddings(self, x, edge_index):
+        """Get node embeddings without classification"""
         # Graph convolution layers
         for i, conv in enumerate(self.convs):
             x = conv(x, edge_index)
             if i < len(self.convs) - 1:  # No activation after last conv layer
                 x = F.relu(x)
                 x = self.dropout(x)
+        return x
+    
+    def forward(self, x, edge_index, batch=None):
+        """Forward pass through the GNN"""
+        # Get embeddings
+        x = self.get_embeddings(x, edge_index)
         
         # Global pooling for graph-level prediction (if batch is provided)
         if batch is not None:

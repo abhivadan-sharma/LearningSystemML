@@ -11,8 +11,9 @@ from typing import Dict, Tuple, List
 class ModelEvaluator:
     """Evaluate dropout prediction models"""
     
-    def __init__(self):
+    def __init__(self, config=None):
         self.results = {}
+        self.config = config
     
     def compute_classification_metrics(self, y_true: np.ndarray, y_pred: np.ndarray, 
                                      y_pred_proba: np.ndarray = None, 
@@ -184,6 +185,50 @@ class ModelEvaluator:
         print(target_accuracy.head(10))
         
         return df
+    
+    def create_evaluation_report(self, metrics: Dict, test_labels: np.ndarray, model_name: str):
+        """Create a comprehensive evaluation report"""
+        from pathlib import Path
+        import datetime
+        
+        if self.config is None:
+            results_dir = Path("logs/results")
+        else:
+            results_dir = Path(self.config.evaluation.results_dir)
+        
+        results_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create evaluation report
+        report_data = {
+            'Model': model_name,
+            'Timestamp': datetime.datetime.now().isoformat(),
+            'Test_Samples': len(test_labels),
+            'Positive_Samples': np.sum(test_labels),
+            'Negative_Samples': len(test_labels) - np.sum(test_labels),
+            'Class_Distribution': f"{np.sum(test_labels)/len(test_labels):.3f} dropout rate"
+        }
+        
+        # Add metrics
+        report_data.update(metrics)
+        
+        # Save detailed report
+        report_df = pd.DataFrame([report_data])
+        report_path = results_dir / f"evaluation_report_{model_name.replace('.', '_')}.csv"
+        report_df.to_csv(report_path, index=False)
+        
+        # Print summary
+        print(f"\n{'='*50}")
+        print(f"EVALUATION REPORT: {model_name}")
+        print(f"{'='*50}")
+        print(f"Test samples: {len(test_labels)}")
+        print(f"Dropout rate: {np.sum(test_labels)/len(test_labels):.1%}")
+        print(f"Accuracy: {metrics['accuracy']:.4f}")
+        print(f"Precision: {metrics['precision']:.4f}")  
+        print(f"Recall: {metrics['recall']:.4f}")
+        print(f"F1-Score: {metrics['f1_score']:.4f}")
+        print(f"ROC-AUC: {metrics['roc_auc']:.4f}")
+        print(f"Report saved to: {report_path}")
+        print(f"{'='*50}\n")
 
 if __name__ == "__main__":
     # Example usage
